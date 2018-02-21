@@ -1,0 +1,11 @@
+- env[gabo]:
+    region: us-east-1
+    custom-ansible: ansible
+
+- amis[us-east-1]:
+    ubuntu: ami-0b383171       # ubuntu 16.04 xenial, update according to https://cloud-images.ubuntu.com/locator/ec2/
+
+- subnet[public]:
+    cidr: [10.0.128.0/19, 10.0.160.0/19]
+
+- s3[deploy]:

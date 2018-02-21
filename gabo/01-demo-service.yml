@@ -1,0 +1,40 @@
+- ami[website]:
+    base-ami: ubuntu
+    playbook: website/website-playbook.yml
+
+- security-group[website-elb]:
+    ingress:
+      - {cidr: 0.0.0.0/0, protocol: [http, https]}
+
+- security-group[website]:
+    ingress:
+      - {cidr: 181.114.27.82/32, protocol: ssh}
+      - {security-group: website-elb, protocol: [8443]}
+
+- target-group[website]:
+    health-check: /health-check
+    protocol: https
+    port: 8443
+
+- instance-profile[website]:
+    policy: website/website-policy.json
+
+- elb-v2[website]:
+    listen: [http, https]
+    cert: arn:aws:acm:us-east-1:801813351686:certificate/2be4c7c7-7fa5-4885-a211-dfff86b046fe
+    security-group: website-elb
+    subnet: public
+    target-group: website
+
+- auto-scaling[website]:
+    instance-type: t2.micro
+    security-group: website
+    ami: website
+    capacity: {min: 1, desired: 1, max: 1}
+    ebs: {size: 20G}
+    scale:
+      - {name: 'scale-out', cpu: '>=80%', last: '2min', adjustment: '100%'}
+      - {name: 'scale-in', cpu: '<=20%', last: '30min', adjustment: '-50%'}
+    target-group: website
+    instance-profile: website
+    subnet: public

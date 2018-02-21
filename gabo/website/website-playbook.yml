@@ -1,0 +1,8 @@
+- hosts: localhost
+  roles: [nginx, app]
+  vars:
+    app_name: demo-site
+    app_s3_bucket: gabo-deploy
+    app_java_opts: -XX:+UseG1GC -Xms250m -Xmx250m -Xss256k -Djava.awt.headless=true
+
+  tasks:
